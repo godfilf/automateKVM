@@ -16,8 +16,8 @@ lo scopo di questo Playbook, grazie ai ruoli integrati, è quello di :
 
 prerequisito:
 
-python >= 2.9
-libvirtd : As of version libvirt 0.6.0 (Jan 2009), restarting the libvirtd service will not stop virtual guests.
+- python >= 2.9
+- libvirtd : As of version libvirt 0.6.0 (Jan 2009), restarting the libvirtd service will not stop virtual guests.
 
 
 
