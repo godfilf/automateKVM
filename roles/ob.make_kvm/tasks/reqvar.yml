@@ -1,0 +1,6 @@
+---
+- name: 'Controllo prametri null o invalidi'
+  fail: msg="Necessario Inserire il parametro {{ item }}"
+  loop: [ vm_name, br_if ]
+  when: "{{ item }} is not defined or {{ item }} == 'null'"
+

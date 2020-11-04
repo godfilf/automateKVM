@@ -1,0 +1,20 @@
+---
+#Create the template 
+
+- name: prepare | create directory for Virtual Machines
+  become: yes
+  file:
+    path: "{{ vm_directory }}"
+    state: directory
+    owner: overburn
+    group: overburn
+    mode: 0775
+    recurse: yes
+
+- name: prepare | set root password
+  #become: yes
+  shell: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --root-password password:{{ vm_root_pwd }}
+
+#- name: prepare | remove cloud init
+#  ##become: yes
+#  shell: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --run-command 'yum remove cloud-init* -y'

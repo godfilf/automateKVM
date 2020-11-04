@@ -1,0 +1,87 @@
+---
+#Create Virtual Machine
+
+- name: Correct BUG Permission
+  script: ../templates/script/change_perm.bash {{ vm_directory }}/{{ vm_name }}.qcow2 >> /tmp/result.pippo
+
+- name: prepare | boot vm
+  #shell: virt-install --connect qemu:///system --ram {{ memory_size }}  --vcpus maxvcpus=10 --vcpus {{ cpu_count }}  --os-variant {{ os_var }} --disk path={{ vm_directory}}/{{ vm_name }}.qcow2,device=disk,bus=virtio,format=qcow2 --import --noautoconsole --vnc --network=bridge:{{ bridge_name }} --name {{ vm_name }}
+  shell: virt-install --connect qemu:///system --ram {{ vm_mem }}  --vcpus {{ vm_vcpu }}  --os-variant {{ vm_os }} --disk path={{ vm_directory}}/{{ vm_name }}.qcow2,device=disk,perms=rw,bus=virtio,format=qcow2 --import --noautoconsole --vnc --network=bridge:{{ br_if }} --name {{ vm_name }}
+#  when: create_vm  == "yes"
+
+- name: Spegnimento {{ vm_name }}
+  community.libvirt.virt:
+    name: "{{ vm_name }}"
+    command: destroy
+
+##- name: list all VMs
+##  community.libvirt.virt:
+##    command: list_vms
+##  register: all_vms
+##- debug:
+##    var: all_vms
+
+
+- name: Correct BUG Permission
+  script: ../templates/script/change_perm.bash {{ vm_directory }}/{{ vm_name }}.qcow2 >> /tmp/result.pippo
+
+- name: prepare | remove cloud init
+  ##become: yes
+  shell: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --run-command 'yum remove cloud-init* -y'
+
+
+- name: Preparo ifcfg-eth0 file
+  #become: yes
+  shell: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --run-command 'rm /etc/sysconfig/network-scripts/ifcfg-eth0 '
+  when: create_vm  == "yes"
+  ignore_errors: yes
+
+
+- name: prepare | set ifcfg-eth0 file
+  #become: yes
+  shell: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --run-command 'echo {{ item }}  >> /etc/sysconfig/network-scripts/ifcfg-eth0 '
+  with_items: 
+    - DEVICE="eth0"
+    - ONBOOT="yes"
+    - TYPE="Ethernet"
+    - PEERDNS="yes"
+    - IPV6INIT="no"
+    - IPADDR={{ ip_address }}
+    - NETMASK={{ netmask }}
+    - GATEWAY={{ gateway }}
+    - DNS1={{ dns1 }}
+  when: create_vm  == "yes"
+  ignore_errors: yes
+
+- name: Accensione {{ vm_name }}
+  community.libvirt.virt:
+    name: "{{ vm_name }}"
+    command: start
+
+- name: Spegnimento {{ vm_name }}
+  community.libvirt.virt:
+    name: "{{ vm_name }}"
+    command: destroy
+
+- name: Correct BUG Permission
+  script: ../templates/script/change_perm.bash {{ vm_directory }}/{{ vm_name }}.qcow2 >> /tmp/result.pippo
+
+- name: prepare | set USER account
+  shell: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --firstboot-command 'useradd -m -p "" {{ vm_user }}; chage -d 0 {{ vm_user }}'
+  when: vm_user is defined
+
+- name: prepare | set hostname
+##  command: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --run-command 'hostnamectl set-hostname {{ hostname_full }}'
+  command: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --hostname {{ hostname_full }}
+
+- name: Accensione {{ vm_name }}
+  community.libvirt.virt:
+    name: "{{ vm_name }}"
+    command: start
+
+##
+##- name: prepare | live set {{ vm_name }} vCPU {{ cpu_set }}
+##  shell: virsh --connect qemu:///system setvcpus {{ vm_name }}  {{ cpu_set }} --live --guest --hotpluggable 
+##
+##- name: prepare | live save config {{ vm_name }} vCPU {{ cpu_set }}
+##  shell: virsh --connect qemu:///system setvcpus {{ vm_name }}  {{ cpu_set }} --config 

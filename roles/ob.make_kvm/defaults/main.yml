@@ -1,0 +1,53 @@
+---
+# defaults file for ob.make_kvm
+
+###################################
+#lib_vm:
+#  - vm_name: "{{ vm }}"
+#    hostname_full: "{{ hostname }}"
+#
+#lib_net:
+#  - bridge_name: "{{ br_if }}"
+#    net_name: "{{ br_net }}"
+###################################
+
+#vm_name: "null"
+hostname_full: "{{ hostname }}"
+vm_mem: '512'
+vm_vcpu: '1'
+vm_os: 'generic'
+vm_root_pwd: 'p1pp0123'
+
+
+qcow: "null"
+path_img: "../templates/qcowimg"
+qcow_name: "CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2"
+vm_directory: "/Work/StoreVM"
+
+#br_net:
+br_if: "null"
+br_net_gw: "192.168.123.1"
+br_net_mask: 255.255.255.0
+ip_address: "192.168.123.3"
+netmask: "255.255.255.0"
+gateway: "192.168.123.1"
+
+
+template_size: "50G"
+
+
+## Definizione Var Statiche sull'Hypervisor
+create_vm: "yes"
+###
+dns1: "8.8.8.8"
+
+#hostname: 
+
+
+
+#######
+# inutili
+#
+#qcowpath: "{{ path_img }}"
+#srcqcow: "{{ qcow_name }}"
+#vm_directory: "{{ dest_path_img }}"

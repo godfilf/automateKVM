@@ -1,0 +1,35 @@
+---
+- name: Create VMs
+  hosts: hypervisor
+  remote_user: overburn
+  roles:
+    - role: ob.make_kvm
+###############################
+#      lib_vm:
+#        vm: 'vm2'
+#        hostname: 'centos1'
+#      lib_net:
+#        - br_net: 'kvm-NAT'
+###############################
+
+## implementare un controllo sulla definizione delle variabili
+      vm_name: 'vm2'
+      hostname: 'centos1'
+      vm_mem: '1024'
+      vm_vcpu: '1'
+      vm_os: 'generic'
+      vm_root_pwd: 'p1pp0123'
+      vm_user: 'kadmin'
+
+# i seguenti parametri non sono obbligatori. se non li set va con quelli di default
+      qcow: present
+      path_img: '/Work/Scaricati'
+      qcow_name: 'CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2'
+      vm_directory: '/Work/StoreVM'
+
+# br_net e br_if sono prametri obbligatori, altrimenti fallisce
+#      br_net: kvm-NAT
+#      br_net_gw: 192.168.124.1
+#      br_net_mask: 255.255.255.0
+      br_if: 'knat0'
+

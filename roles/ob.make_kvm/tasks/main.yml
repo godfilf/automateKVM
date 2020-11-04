@@ -1,0 +1,11 @@
+---
+
+#- name: Variabile br_net
+#  debug:
+#    msg: VAR = {{ br_if }}
+
+- include: reqvar.yml
+- include_tasks: chkimg.yml
+- include_tasks: creanat.yml
+- include_tasks: basicconf.yml
+- include_tasks: create_vm.yml
