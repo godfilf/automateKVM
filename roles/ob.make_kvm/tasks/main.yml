@@ -4,6 +4,8 @@
 #  debug:
 #    msg: VAR = {{ br_if }}
 
+
+- include: setvmhosts.yml
 - include: reqvar.yml
 - include_tasks: chkimg.yml
 - include_tasks: creanat.yml

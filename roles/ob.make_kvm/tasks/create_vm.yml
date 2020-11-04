@@ -67,7 +67,7 @@
   script: ../templates/script/change_perm.bash {{ vm_directory }}/{{ vm_name }}.qcow2 >> /tmp/result.pippo
 
 - name: prepare | set USER account
-  shell: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --firstboot-command 'useradd -m -p "" {{ vm_user }}; chage -d 0 {{ vm_user }}'
+  shell: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --run-command 'useradd -m -p "" {{ vm_user }}; chage -d 0 {{ vm_user }}'
   when: vm_user is defined
 
 - name: prepare | set hostname

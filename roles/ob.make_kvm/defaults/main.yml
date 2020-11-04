@@ -1,15 +1,10 @@
 ---
 # defaults file for ob.make_kvm
+###################################
 
-###################################
-#lib_vm:
-#  - vm_name: "{{ vm }}"
-#    hostname_full: "{{ hostname }}"
-#
-#lib_net:
-#  - bridge_name: "{{ br_if }}"
-#    net_name: "{{ br_net }}"
-###################################
+filetarget: "hosts/hosts.target"
+hoststarget: "{{ pbpath }}/{{ filetarget }}"
+filehosts: "/etc/hosts"
 
 #vm_name: "null"
 hostname_full: "{{ hostname }}"
@@ -23,6 +18,9 @@ qcow: "null"
 path_img: "../templates/qcowimg"
 qcow_name: "CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2"
 vm_directory: "/Work/StoreVM"
+template_size: "50G"
+
+
 
 #br_net:
 br_if: "null"
@@ -31,16 +29,12 @@ br_net_mask: 255.255.255.0
 ip_address: "192.168.123.3"
 netmask: "255.255.255.0"
 gateway: "192.168.123.1"
-
-
-template_size: "50G"
-
-
-## Definizione Var Statiche sull'Hypervisor
-create_vm: "yes"
-###
 dns1: "8.8.8.8"
 
+
+
+###
+create_vm: "yes"
 #hostname: 
 
 

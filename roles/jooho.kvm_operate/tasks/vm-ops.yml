@@ -1,0 +1,131 @@
+---
+
+- name: Check params for start/stop/suspend/destroy/teardown
+  fail:
+    msg: "Not sufficient parameters!! You should set prefix_vm or vm_name"
+  when:
+  - not operate in [ 'start','stop', 'suspend', 'destroy', 'teardown' ]
+  - not (prefix_vm is undefined or vm_name is undefined)
+
+- name: Match operate
+  block:
+    - set_fact:
+        virt_operate: running
+      when: operate == 'start'
+    - set_fact:
+        virt_operate: shutdown
+      when: operate == 'stop'
+    - set_fact:
+        virt_operate: paused
+      when: operate == 'suspend'
+    - set_fact:
+        virt_operate: destroyed
+      when: operate == 'destroy' or operate == 'teardown'
+
+# Single VM
+- name: Change status for single VM
+  virt: state="{{ virt_operate }}" name="{{ vm_name }}"
+  become: yes
+  delegate_to: "{{ kvm_install_host }}"
+  when: vm_name is defined
+
+- name: Undefine for single VM
+  command: virsh -c qemu:///system undefine "{{ vm_name }}" --remove-all-storage
+  become: yes
+  delegate_to: "{{ kvm_install_host }}"
+  when:
+  - vm_name is defined
+  - operate == 'teardown'
+
+- name: Make sure all images are deleted
+  block:
+    - name: Gather files under KVM storage pool path
+      find: 
+        paths: "{{ kvm.storage_pool_dir }}"
+        patterns: "{{ vm_name |quote }}*"
+      become: yes
+      register: vm_images_list
+
+    - name: Make sure to delete images
+      file: "path={{ item.path }} state=absent"
+      become: yes
+      with_items:
+      - "{{ vm_images_list.files }}"
+      failed_when: vm_images_list|length > 6
+  when:
+  - vm_name is defined
+  - operate == 'teardown'
+
+- name: Delete VM data directory
+  file: state=absent path="{{ vm_data_dir }}/{{ vm_name }}"
+  become: yes
+  delegate_to: "{{ kvm_install_host }}"
+  when:
+  - vm_name is defined
+  - operate == 'teardown'
+  ignore_errors: yes
+
+# Multiple VMs
+- name: Gather VM list
+  virt: command=list_vms
+  become: yes
+  delegate_to: "{{ kvm_install_host }}"
+  register: vm_list
+
+# - debug: msg="{{ item.find(prefix_vm|quote) }}"
+#   with_items:
+#   - "{{ vm_list.list_vms }}"
+
+- name: Change status for multiple VMs
+  virt: state="{{ virt_operate }}" name="{{ item }}"
+  become: yes
+  delegate_to: "{{ kvm_install_host }}"
+  with_items:
+  - "{{ vm_list.list_vms }}"
+  when:
+  - prefix_vm is defined
+  - item.find(prefix_vm | quote) != -1
+  ignore_errors: yes
+
+- name: Undefine for multiple VMs
+  command: virsh -c qemu:///system undefine "{{ item }}" --remove-all-storage
+  become: yes
+  delegate_to: "{{ kvm_install_host }}"
+  with_items:
+  - "{{ vm_list.list_vms }}"
+  when:
+  - prefix_vm is defined
+  - item.find(prefix_vm | quote) != -1
+  - operate == 'teardown'
+  ignore_errors: yes
+
+- name: Make sure all images are deleted
+  block:
+    - name: Gather files under KVM storage pool path
+      find: 
+        paths: "{{ kvm_storage_pool_dir }}"
+        patterns: "{{ prefix_vm|quote }}*"
+      become: yes
+      register: vm_images_list
+
+    - name: Make sure to delete images
+      file: "path={{ item.path }} state=absent"
+      become: yes
+      with_items:
+      - "{{ vm_images_list.files }}"
+  when:
+  - prefix_vm is defined
+  - operate == 'teardown'
+
+- name: Delete VM data directory
+  file: state=absent path="{{ vm_data_dir }}/{{ item }}"
+  become: yes
+  delegate_to: "{{ kvm_install_host }}"
+  with_items:
+  - "{{ vm_list.list_vms }}"
+  when:
+  - prefix_vm is defined
+  - item.find(prefix_vm) != -1
+  - operate == 'teardown'
+  ignore_errors: yes
+

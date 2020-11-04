@@ -1,0 +1,6 @@
+kvm_install_host: localhost
+kvm_storage_pool_dir: /var/lib/libvirt/images
+kvm_storage_pool_name: default
+
+vm_data_dir: /home/jooho/kvm/vms
+vm_recreate: false

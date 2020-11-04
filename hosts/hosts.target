@@ -1,2 +1,5 @@
 [hypervisor]
 127.0.0.1
+
+[vm]
+vm1

@@ -1,0 +1,63 @@
+---
+
+- name: Check if the targeted vm exist
+  virt: command=status name="{{ target_vm }}"
+  become: yes
+  delegate_to: "{{ kvm_install_host }}"
+
+- name: disk device name list
+  set_fact:
+    disk_device: [ "vda", "vdb", "vdc", "vdd", "vdf", "vde" ]
+
+- name: Check operate for storage
+  fail:
+    msg: "Not sufficient parameters!! You should set disk_size or target_vm"
+  when:
+  - operate == 'attach'
+  - target_vm is undefined or disk_size is undefined
+
+# - name: Change size unit(G) to number(1000)
+#   set_fact:
+#     disk_unit: 1000
+#   when: disk_size is search("G")
+
+# - name: Change size unit(M) to number(100)
+#   set_fact:
+#     disk_unit: 100
+#   when: disk_size is search("M")
+
+- name: Gather the number of storage attached to the VM
+  shell: >
+     virsh domblklist "{{ target_vm }}"|grep "{{ target_vm }}"|wc -l
+  become: yes
+  delegate_to: localhost
+  register: disk_number
+
+- name: Fail if storage is more than 5
+  fail:
+    msg: "The maximum storages are 6. The vm already has 6"
+  when: disk_number.stdout == '6'
+
+- name: For idempotent, check if the image exist
+  stat:
+    path: "{{ kvm_vm_pool_dir }}/{{ target_vm }}_extra_disk_{{ disk_number.stdout }}.qcow2"
+    get_checksum: False
+    get_md5: False
+  become: yes
+  delegate_to: localhost
+  register: disk_exist
+
+# reference
+# command: "dd if=/dev/zero of={{ kvm_vm_pool_dir }}/{{ target_vm }}_extra_disk_{{ disk_number.stdout }}.qcow2 bs=1M count={{ disk_size|regex_replace('[A-Z]','')|int * disk_unit|int }}"
+
+- name: Create qcow2 image
+  command: "qemu-img create  -f raw {{ kvm_vm_pool_dir }}/{{ target_vm }}_extra_disk_{{ disk_number.stdout }}.qcow2 {{ disk_size }}"  
+  become: yes
+  delegate_to: localhost
+  when: not disk_exist.stat.exists
+
+- name: Attach storage to VM
+  shell: >
+     virsh attach-disk  {{ target_vm }}  {{ kvm_vm_pool_dir }}/{{ target_vm }}_extra_disk_{{ disk_number.stdout|int }}.qcow2 {{disk_device[disk_number.stdout|int]}}  --live --persistent
+  become: yes
+  delegate_to: localhost
