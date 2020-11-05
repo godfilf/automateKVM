@@ -2,34 +2,38 @@
 - name: Create VMs
   hosts: hypervisor
   remote_user: overburn
-  vars:
-    ip_address: "192.168.123.4"
-    namevm: 'vm1'
+##  vars:
+##    ip_address: "192.168.123.4"
+##    namevm: 'vm1'
   roles:
     - role: ob.make_kvm
-      pbpath: '/Work/MyPrj'
-#### implementare un controllo sulla definizione delle variabili
-      vm_name: 'vm1'
-      hostname: 'centos1'
-      vm_mem: '1024'
-      vm_vcpu: '1'
-      vm_os: 'generic'
-      vm_root_pwd: 'p1pp0123'
-      vm_user: 'kadmin'
-# i seguenti parametri non sono obbligatori. se non li set va con quelli di default
-      qcow: present
-      path_img: '/Work/Scaricati'
-      qcow_name: 'CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2'
-      vm_directory: '/Work/StoreVM'
-# br_net e br_if sono prametri obbligatori, altrimenti fallisce
-#      br_net: kvm-NAT
-#      br_net_gw: 192.168.124.1
-#      br_net_mask: 255.255.255.0
-      br_if: 'knat0'
-      ip_address: "192.168.123.4"
-      netmask: "255.255.255.0"
-      gateway: "192.168.123.1"
-     
+      pbpath: '/Work/MyPrj/hosts'
+      filetarget: "hosts.target"
+
+      lib_vm:
+        vm_name: 'vm1'
+        vm_mem: '1024'
+        vm_vcpu: '1'
+        vm_os: 'generic'
+        vm_root_pwd: 'p1pp0123'
+        vm_user: 'kadmin'
+        qcow: 'present'
+        path_img: '../templates/qcowimg'
+        qcow_name: "CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2"
+        vm_directory: '/Work/StoreVM'
+
+      lib_os:
+        hostname: "centos1"
+
+      lib_net:
+        br_if: "knat0"
+        br_net: kvm-NAT
+        br_net_gw: 192.168.124.1
+        br_net_mask: 255.255.255.0
+        ip_address: "192.168.123.4"
+        netmask: "255.255.255.0"
+        gateway: "192.168.123.1"
+
 ##    - role: ob.make_kvm
 #### implementare un controllo sulla definizione delle variabili
 ##      vm_name: 'vm2'
@@ -61,35 +65,64 @@
 ##        disk_size: 40G
 ##        kvm_vm_pool_dir: '/Work/StoreVM'
 ##
-- name: Crate Docker
-  hosts: vm1
-  remote_user: kadmin
-  become: yes
-  roles:
-    - role: darkwizard242.docker
-      docker_apps:
-        - docker-ce
-        - docker-ce-cli
-        - containerd.io
-      docker_apps_desired_state: present
-      docker_service_name: docker
-      docker_service_desired_state: restarted
-      docker_service_desired_boot_enabled: yes
-      docker_group: kadmin
-      docker_group_desired_state: present
-      docker_user: kadmin
-      docker_user_home: "/home/{{ docker_user }}"
-      docker_user_shell: /bin/bash
-      docker_user_desired_state: present
-      docker_centos_pre_reqs:
-        - device-mapper-persistent-data
-        - lvm2
-      docker_centos_pre_reqs_desired_state: present
-      docker_repo_centos: https://download.docker.com/linux/centos/8/$basearch/stable
-      docker_repo_centos_gpg_key: https://download.docker.com/linux/centos/gpg
-      docker_repo_centos_name: docker-ce-stable
-      docker_repo_centos_description: Docker CE Stable - $basearch
-      docker_repo_centos_gpgcheck: yes
-      docker_repo_centos_enabled: yes
-      docker_repo_centos_filename: docker-ce
-      docker_repo_centos_desired_state: present
+##
+##- name: Crate Docker
+##  hosts: vm1
+##  remote_user: kadmin
+##  become: yes
+##  roles:
+##    - role: ob.manage_lvm
+##      vg_groups: 
+##        vgname: vg_docker
+##        disks:
+##          - /dev/vdb
+##          - /dev/vdc
+##      lv_groups:
+##### vglvname da Inserire solo per creare LV su VG esistente
+###        vglvname: vg_docker
+##### se lvname è definito, crea anche il LV dopo aver definito il VG
+##        lvname: lv_docker1
+##        size: 10g
+##        create: true
+##        filesystem: ext4
+##        mount: true
+##        mntp: /mnt
+##
+##    - role: darkwizard242.docker
+##      docker_apps:
+##        - docker-ce
+##        - docker-ce-cli
+##        - containerd.io
+##      docker_apps_desired_state: present
+##      docker_service_name: docker
+##      docker_service_desired_state: restarted
+##      docker_service_desired_boot_enabled: yes
+##      docker_group: kadmin
+##      docker_group_desired_state: present
+##      docker_user: kadmin
+##      docker_user_home: "/home/{{ docker_user }}"
+##      docker_user_shell: /bin/bash
+##      docker_user_desired_state: present
+##      docker_centos_pre_reqs:
+##        - device-mapper-persistent-data
+##        - lvm2
+##      docker_centos_pre_reqs_desired_state: present
+##      docker_repo_centos: https://download.docker.com/linux/centos/8/$basearch/stable
+##      docker_repo_centos_gpg_key: https://download.docker.com/linux/centos/gpg
+##      docker_repo_centos_name: docker-ce-stable
+##      docker_repo_centos_description: Docker CE Stable - $basearch
+##      docker_repo_centos_gpgcheck: yes
+##      docker_repo_centos_enabled: yes
+##      docker_repo_centos_filename: docker-ce
+##      docker_repo_centos_desired_state: present
+
+
+#    - role: ome.docker
+#      #docker_use_custom_storage: True
+#      docker_vgname: vg_docker
+#      docker_poolsize: 100%FREE
+#      docker_metadatasize: 400m
+#      lvm_lvname: lv_docker
+#      lvm_lvmount: /var/lib/docker
+#      lvm_lvsize: 40g
+#      lvm_lvfilesystem: ext4

@@ -1,47 +1,73 @@
 ---
 # defaults file for ob.make_kvm
 ###################################
-
 filetarget: "hosts/hosts.target"
 hoststarget: "{{ pbpath }}/{{ filetarget }}"
 filehosts: "/etc/hosts"
 
-#vm_name: "null"
-hostname_full: "{{ hostname }}"
-vm_mem: '512'
-vm_vcpu: '1'
-vm_os: 'generic'
-vm_root_pwd: 'p1pp0123'
+lib_vm:
+  #vm_name:
+  vm_mem: '512'
+  vm_vcpu: '1'
+  vm_os: 'generic'
+  vm_root_pwd: 'p1pp0123'
+  qcow: "null"
+  path_img: "null"
+  qcow_name: "CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2"
+  vm_directory: "/Work/StoreVM"
+  template_size: "50G"
+  
+lib_os:
+  hostname_full: "{{ hostname }}"
+  
+lib_net:
+  #br_net:
+  br_if: "null"
+  br_net_gw: "192.168.123.1"
+  br_net_mask: 255.255.255.0
+  ip_address: "192.168.123.3"
+  netmask: "255.255.255.0"
+  gateway: "192.168.123.1"
+  dns1: "8.8.8.8"
 
 
-qcow: "null"
-path_img: "../templates/qcowimg"
-qcow_name: "CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2"
-vm_directory: "/Work/StoreVM"
-template_size: "50G"
 
-
-
-#br_net:
-br_if: "null"
-br_net_gw: "192.168.123.1"
-br_net_mask: 255.255.255.0
-ip_address: "192.168.123.3"
-netmask: "255.255.255.0"
-gateway: "192.168.123.1"
-dns1: "8.8.8.8"
-
-
-
+##
+###vm_name: "null"
+##hostname_full: "{{ hostname }}"
+##vm_mem: '512'
+##vm_vcpu: '1'
+##vm_os: 'generic'
+##vm_root_pwd: 'p1pp0123'
+##
+##
+##qcow: "null"
+##path_img: "../templates/qcowimg"
+##qcow_name: "CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2"
+##vm_directory: "/Work/StoreVM"
+##template_size: "50G"
+##
+##
+##
+###br_net:
+##br_if: "null"
+##br_net_gw: "192.168.123.1"
+##br_net_mask: 255.255.255.0
+##ip_address: "192.168.123.3"
+##netmask: "255.255.255.0"
+##gateway: "192.168.123.1"
+##dns1: "8.8.8.8"
+##
+##
+##
+#####
+##create_vm: "yes"
+###hostname: 
+##
+##
+#########
+### inutili
 ###
-create_vm: "yes"
-#hostname: 
-
-
-
-#######
-# inutili
-#
-#qcowpath: "{{ path_img }}"
-#srcqcow: "{{ qcow_name }}"
-#vm_directory: "{{ dest_path_img }}"
+###qcowpath: "{{ path_img }}"
+###srcqcow: "{{ qcow_name }}"
+###vm_directory: "{{ dest_path_img }}"

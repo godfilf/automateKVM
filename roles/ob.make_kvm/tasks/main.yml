@@ -1,13 +1,16 @@
 ---
 
+## Non mi funziona il plugin lookup :(
 #- name: Variabile br_net
 #  debug:
-#    msg: VAR = {{ br_if }}
+#    msg: VAR = {{ vg.vgname }}
+#  loop: "{{ vg_groups }}"
+#  loop_control:
+#    loop_var: vg
 
 
-- include: setvmhosts.yml
-- include: reqvar.yml
-- include_tasks: chkimg.yml
-- include_tasks: creanat.yml
-- include_tasks: basicconf.yml
-- include_tasks: create_vm.yml
+- name: include tasks di creazione VM
+  include_tasks: runmake.yml
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian" 
+    
+

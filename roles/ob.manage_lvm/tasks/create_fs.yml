@@ -1,0 +1,61 @@
+---
+
+# unable to resize xfs: looks like we've to reference the mountpoint instead of the device
+- name: create_fs | check already converted
+  # at least xfs is executed twice if the partition has changed in the meantime
+  # then it tries to recreate the fs on the mounted fs which indeed fails...
+  shell: "xfs_info {{ lv.mntp }} | grep -c 'ftype=1'"
+  become: yes
+  register: mountedxfs
+  ignore_errors: true
+  changed_when: false
+  when:
+    - lv_groups.filesystem == "xfs"
+
+- name: create_fs | unmounting filesystem(s)
+  mount:
+    path: "{{ lv_groups.mntp }}"
+    src: "/dev/{{ vg_groups.vgname }}/{{ lv_groups.lvname }}"
+    fstype: "{{ lv_groups.filesystem | default(omit) }}"
+    state: absent
+  become: true
+  when:
+    - lv_groups.filesystem != "swap"
+    - lv_groups.mount|bool
+
+- name: create_fs | creating new filesystem on new LVM logical volume(s)
+  filesystem:
+    fstype: "{{ lv_groups.filesystem }}"
+    dev: "/dev/{{ vg_groups.vgname }}/{{ lv_groups.lvname }}"
+    resizefs: yes
+  become: true
+  when:
+    - lv_groups.filesystem != 'xfs'
+
+- name: create_fs | creating new xfs filesystem on new LVM logical volume(s)
+  filesystem:
+    fstype: "{{ lv_groups.filesystem }}"
+    dev: "/dev/{{ vg_groups.vgname }}/{{ lv_groups.lvname }}"
+  become: true
+  when:
+    - lv_groups.filesystem == 'xfs'
+
+- name: create_fs | mounting new filesystem(s)
+  mount:
+    path: "{{ lv_groups.mntp }}"
+    src: "/dev/{{ vg_groups.vgname }}/{{ lv_groups.lvname }}"
+    fstype: "{{ lv_groups.filesystem }}"
+    state: mounted
+    opts: "{{ lv_groups.mopts | default('defaults') }}"
+  become: true
+  when:
+    - lv_groups.mount is defined
+    - lv_groups.mount|bool
+
+- name: create_fs | resizing xfs filesystem on new LVM logical volume(s)
+  command: "xfs_growfs {{ lv.mntp }}"
+  become: true
+  when:
+    - lv_groups.filesystem == 'xfs'
+    - lvchanged.changed
+

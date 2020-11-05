@@ -1,7 +1,7 @@
 ---
 - name: Copia il QCOW 
   copy:
-    src: "{{ path_img }}/{{ qcow_name }}"
-    dest: "{{ vm_directory }}/{{ vm_name }}.qcow2"
-  when: vm_name is defined and qcow == 'present'
+    src: "{{ lib_vm.path_img }}/{{ lib_vm.qcow_name }}"
+    dest: "{{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2"
+  when: lib_vm.vm_name is defined and lib_vm.qcow == 'present'
 

@@ -14,13 +14,12 @@
     name: "{{ vm_name }}"
     command: destroy
 
-##- name: list all VMs
-##  community.libvirt.virt:
-##    command: list_vms
-##  register: all_vms
-##- debug:
-##    var: all_vms
-
+- name: list all VMs
+  community.libvirt.virt:
+    command: list_vms
+  register: all_vms
+- debug:
+    var: all_vms
 
 - name: Correct BUG Permission
   script: ../templates/script/change_perm.bash {{ vm_directory }}/{{ vm_name }}.qcow2 >> /tmp/result.pippo
@@ -71,7 +70,6 @@
   when: vm_user is defined
 
 - name: prepare | set hostname
-##  command: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --run-command 'hostnamectl set-hostname {{ hostname_full }}'
   command: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --hostname {{ hostname_full }}
 
 - name: Accensione {{ vm_name }}

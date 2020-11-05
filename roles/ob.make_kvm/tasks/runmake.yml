@@ -1,0 +1,7 @@
+---
+- include_tasks: reqvar.yml
+- include_tasks: setvmhosts.yml
+- include_tasks: chkimg.yml
+- include_tasks: creanat.yml
+- include_tasks: basicconf.yml
+- include_tasks: create_vm.yml

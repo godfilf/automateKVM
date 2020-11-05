@@ -1,0 +1,11 @@
+---
+- name: create_vg | creating new LVM volume group(s)
+  lvg:
+    vg: "{{ vg_groups.vgname }}"
+    pvs: "{{ vg_groups.disks | join(',') }}"
+    state: present
+  become: true
+
+- name: manage_lvm | create LV
+  include_tasks: create_lv.yml
+  when: lv_groups.lvname != "false"

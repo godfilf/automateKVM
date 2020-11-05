@@ -1,0 +1,15 @@
+---
+- name: create_lv | creating new LVM logical volume(s)
+  lvol:
+    vg: "{{ vg_groups.vgname }}"
+    lv: "{{ lv_groups.lvname }}"
+    size: "{{ lv_groups.size }}"
+    shrink: false
+    opts: "{{ lv_groups.opts | default('') }}"
+    state: present
+  become: true
+
+- name: create_lv | configuring FS
+  include_tasks: create_fs.yml
+  when: lv_groups.mount is defined
+

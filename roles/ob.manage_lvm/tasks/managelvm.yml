@@ -1,0 +1,13 @@
+---
+
+##- name: Installa prerequisiti
+##  include_tasks: prereq.yml
+
+- name: manage_lvm | manage physical volume group creation
+  include_tasks: create_vg.yml
+  when: lv_groups.vglvname is not defined
+
+- name: manage_lvm | create only lv
+  include_tasks: create_lv.yml
+  when: lv_groups.vglvname is defined
+

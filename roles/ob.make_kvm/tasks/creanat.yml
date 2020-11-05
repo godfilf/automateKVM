@@ -1,41 +1,52 @@
 ---
 # Crea La net in base alla scelta effettuata sul prompt
 
-
-- name: makenet | crea la Net con KVM
+- name: make XML net file
   copy:
-    dest: "/tmp/kvmNAT.xml"
+    dest: "/tmp/kvmNAT.xml.j2"
     content: |
       <network>
-        <name>{{ br_net }}</name>
-        <bridge name="{{ br_if }}"/>
+        <name>{{ lib_net.br_net }}</name>
+        <bridge name="{{ lib_net.br_if }}"/>
         <forward mode="nat"/>
-        <ip address="{{ br_net_gw }}" netmask="{{ br_net_mask }}">
+        <ip address="{{ lib_net.br_net_gw }}" netmask="{{ lib_net.br_net_mask }}">
         </ip>
       </network>
 
-  when: br_net is defined and br_if != 'null' 
+  when: lib_net.br_net is defined and lib_net.br_if != 'null' 
 
-#- name: controlnet
-  #virt_net:
-    #state: present
-    #name: kvm-NAT
-
-- name: runnet
+- name: Define NET
   become: yes
   command: "virsh net-{{ item }}"
   with_items:
   - define --file /tmp/kvmNAT.xml
-  - start kvm-NAT
-  - autostart kvm-NAT
-  when: br_net is defined and br_if != 'null'
+  when: lib_net.br_net is defined and lib_net.br_if != 'null'
+
+- name: set autostart NET
+  community.libvirt.virt_net:
+    autostart: yes
+    name: "{{ lib_net.br_net }}"
+  when: lib_net.br_net is defined and lib_net.br_if != 'null'
+
+- name: Start NET
+  community.libvirt.virt_net:
+    command: start 
+    name: "{{ lib_net.br_net }}"
+  when: lib_net.br_net is defined and lib_net.br_if != 'null'
+
+- name: Stato NET
+  community.libvirt.virt_net:
+    command: status
+    name: "{{ lib_net.br_net }}"
+  when: lib_net.br_net is defined and lib_net.br_if != 'null'
+
 
 - name: chknet | Se la rete non viene creata lo indica
   ansible.builtin.debug:
     msg: 'Rete KVM non Creata da Template'
-  when: br_net is not defined or br_if == 'null'
+  when: lib_net.br_net is defined and lib_net.br_if != 'null'
 
 - name: chkip | Avvisa che non è stato adottato l'IP di template
   debug:
     msg: Template Network 192.168.123.1 Non Definita
-  when: br_net_gw != '192.168.123.1'
+  when: lib_net.br_net_gw != '192.168.123.1'

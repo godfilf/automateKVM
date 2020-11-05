@@ -1,0 +1,16 @@
+vg_groups:
+  vgname: "{{ lv_groups.vglvname }}"
+  disks:
+  create: true
+
+lv_groups:
+  lvname: false
+#       # 100%FREE, 10g, 1024 (megabytes by default)
+  size: 5g
+  opts: ''
+#       # Defines if lvol should exist or be removed
+  create: true
+  filesystem: swap
+  mntp: []
+  mopts: ''
+

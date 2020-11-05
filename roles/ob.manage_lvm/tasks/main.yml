@@ -1,0 +1,5 @@
+---
+- name: include i tasks di creazione LVM
+  include_tasks: managelvm.yml
+  when: ansible_os_family == "RedHat" 
+

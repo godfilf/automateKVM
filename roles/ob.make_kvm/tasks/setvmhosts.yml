@@ -1,18 +1,16 @@
 ---
-##- name: Set VM HOSTS
-##  become: yes
-##  delegate_to: localhost
-##  lineinfile:
-##    path: "{{ filehosts }}"
-##    line: "{{ ip_address }} {{ vm_name }} #Created by Ansible Automate"
+- name: Set VM HOSTS
+  become: yes
+  delegate_to: localhost
+  lineinfile:
+    path: "{{ filehosts }}"
+    line: "{{ lib_net.ip_address }} {{ lib_vm.vm_name }} #Created by Ansible Automate"
 
 - name: Update Installed Inventory 
   delegate_to: localhost
   lineinfile:
-#    path: "{{ hosttarget }}"
-    path: "{{ pbpath }}/{{ filetarget }}"
-#    regexp: ^[vm]
+    path: "{{ hoststarget }}"
     insertbefore: ^[vm]
-    line: "{{ vm_name }}"
+    line: "{{ lib_vm.vm_name }}"
     create: yes
 
