@@ -16,14 +16,15 @@
         vm_vcpu: '1'
         vm_os: 'generic'
         vm_root_pwd: 'p1pp0123'
-        vm_user: 'kadmin'
         qcow: 'present'
         path_img: '../templates/qcowimg'
         qcow_name: "CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2"
         vm_directory: '/Work/StoreVM'
 
       lib_os:
-        hostname: "centos1"
+        vm_hostname: "centos1"
+        vm_user: 'kadmin'
+	
 
       lib_net:
         br_if: "knat0"

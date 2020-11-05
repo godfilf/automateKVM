@@ -18,7 +18,8 @@ lib_vm:
   template_size: "50G"
   
 lib_os:
-  hostname_full: "{{ hostname }}"
+  vm_hostname: "null"
+  #vm_user:
   
 lib_net:
   #br_net:

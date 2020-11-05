@@ -27,6 +27,7 @@ filehosts: "/etc/hosts"                 ## Parametro di Default. Questo role, in
 lib_vm:                                 
   #vm_name:                             ## NECESSARIO : Nome della VM. Questo parametro è obbligatorio per poter usare il  role
   vm_mem: '512'                         ## Ram da allocare alla VM. Sono Settati dei valori di default per test
+  #cp_set:                              ## Utilizzato per il live grow delle cpu. parametro commentanto in tasks/create_vm.yml
   vm_vcpu: '1'                          ## vCPU da allocare alla VM.Sono Settati dei valori di default per test
   vm_os: 'generic'                      ## Indica il tipo di OS che verrà installato. Se non lo si conosce si consiglia di lasciare il parametro di default
   vm_root_pwd: 'p1pp0123'               ## NECESSARIO : Definizione della ROOT pwd con la quale fare login. Settato un valore di test
@@ -37,8 +38,9 @@ lib_vm:
   template_size: "50G"                  ## NECESSARIO : Capacità dell'immagine 
  
 lib_os:
-  hostname_full: "{{ hostname }}"       ## Hostname da assegnare all'OS
- 
+  vm_hostname: "null"      ## Hostname da assegnare all'OS se viene definita nel playbook
+  #vm_user:                             ## Crea un utente se viene definita la variabile nel playbook
+  
 lib_net:
   #br_net: "kvm-NAT"                    ## Necessario solo se si vuole far creare al role un rete kvm da 0. Indica il nome della rete in KVM. NON crea schede in bridge. Solo NAT.
   br_if: "null"                         ## Necessario solo se si decide di creare la NET con il role. Questo è il nome della scheda sull'hypervisor KVM

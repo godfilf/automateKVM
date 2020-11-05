@@ -4,7 +4,7 @@
 - name: prepare | create directory for Virtual Machines
   become: yes
   file:
-    path: "{{ vm_directory }}"
+    path: "{{ lib_vm.vm_directory }}"
     state: directory
     owner: overburn
     group: overburn
@@ -13,7 +13,7 @@
 
 - name: prepare | set root password
   #become: yes
-  shell: virt-customize -a {{ vm_directory}}/{{ vm_name }}.qcow2 --root-password password:{{ vm_root_pwd }}
+  shell: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --root-password password:{{ lib_vm.vm_root_pwd }}
 
 #- name: prepare | remove cloud init
 #  ##become: yes
