@@ -10,11 +10,27 @@ Nelle "Variabili", i parametri contenuti nella sezione "lib_vm" sono tutti OBBLI
 Requirements
 ------------
 
-ansible-galaxy collection install community.libvirt
+- Per i miei test ho scaricato una CentOS-8 - CentOS Cloud images :
 
-python >= 2.6 
-python-libvirt
-python-lxml
+        CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2
+
+  al seguente link :
+
+        https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2
+
+  al termine del download posizionare la iso nel path :
+
+        ob.make_kvm/templates/qcowimg/
+
+- Installare la collections dell community di libvirt :
+
+        ansible-galaxy collection install community.libvirt
+
+- Necessario installare sul server e sul client :
+
+        python >= 2.6 
+        python-libvirt
+        python-lxml
 
 
 
@@ -38,8 +54,8 @@ lib_vm:
   template_size: "50G"                  ## NECESSARIO : Capacità dell'immagine 
  
 lib_os:
-  vm_hostname: "null"      ## Hostname da assegnare all'OS se viene definita nel playbook
-  #vm_user:                             ## Crea un utente se viene definita la variabile nel playbook
+  vm_hostname: "null"                   ## Hostname da assegnare all'OS se viene definita nel playbook
+  #vm_user:                             ## Crea un utente se viene definita la variabile nel playbook. Necessario per effettuare il login in ssh
   
 lib_net:
   #br_net: "kvm-NAT"                    ## Necessario solo se si vuole far creare al role un rete kvm da 0. Indica il nome della rete in KVM. NON crea schede in bridge. Solo NAT.

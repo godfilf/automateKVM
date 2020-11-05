@@ -2,9 +2,6 @@
 - name: Create VMs
   hosts: hypervisor
   remote_user: overburn
-##  vars:
-##    ip_address: "192.168.123.4"
-##    namevm: 'vm1'
   roles:
     - role: ob.make_kvm
       pbpath: '/Work/MyPrj/hosts'
