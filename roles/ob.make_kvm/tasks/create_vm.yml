@@ -47,9 +47,9 @@
     - TYPE="Ethernet"
     - PEERDNS="yes"
     - IPV6INIT="no"
-    - IPADDR={{ ip_address }}
-    - NETMASK={{ netmask }}
-    - GATEWAY={{ gateway }}
+    - IPADDR={{ lib_net.ip_address }}
+    - NETMASK={{ lib_net.netmask }}
+    - GATEWAY={{ lib_net.gateway }}
     - DNS1={{ dns1 }}
   when: lib_net.br_if != "null"
 #  ignore_errors: yes
