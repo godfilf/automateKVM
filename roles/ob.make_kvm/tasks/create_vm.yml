@@ -5,12 +5,12 @@
   script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.out
 
 - name: prepare with NET | boot vm
-  shell: virt-install --connect qemu:///system --ram {{ lib_vm.vm_mem }} --vcpus maxvcpus=10 --vcpus {{ lib_vm.vm_vcpu }}  --os-variant {{ lib_vm.vm_os }} --disk path={{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2,device=disk,perms=rw,bus=virtio,format=qcow2 --import --noautoconsole --vnc --network=bridge:{{ lib_net.br_if }} --name {{ lib_vm.vm_name }}
-  when: {{ lib_net.br_if }} != 'null'
+  shell: virt-install --connect qemu:///system --ram "{{ lib_vm.vm_mem }}" --vcpus maxvcpus=10 --vcpus "{{ lib_vm.vm_vcpu }}"  --os-variant "{{ lib_vm.vm_os }}" --disk path="{{ lib_vm.vm_directory}}"/"{{ lib_vm.vm_name }}".qcow2,device=disk,perms=rw,bus=virtio,format=qcow2 --import --noautoconsole --vnc --network=bridge:"{{ lib_net.br_if }}" --name "{{ lib_vm.vm_name }}"
+  when: lib_net.br_if != "null"
 
 - name: prepare without NET | boot vm
-  shell: virt-install --connect qemu:///system --ram {{ lib_vm.vm_mem }} --vcpus maxvcpus=10 --vcpus {{ lib_vm.vm_vcpu }}  --os-variant {{ lib_vm.vm_os }} --disk path={{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2,device=disk,perms=rw,bus=virtio,format=qcow2 --import --noautoconsole --vnc --name {{ lib_vm.vm_name }}
-  when: {{ lib_net.br_if }} == 'null'
+  shell: virt-install --connect qemu:///system --ram "{{ lib_vm.vm_mem }}" --vcpus "{{ lib_vm.vm_vcpu }}"  --os-variant "{{ lib_vm.vm_os }}" --disk path="{{ lib_vm.vm_directory}}"/"{{ lib_vm.vm_name }}".qcow2,device=disk,perms=rw,bus=virtio,format=qcow2 --import --noautoconsole --vnc --name "{{ lib_vm.vm_name }}"
+  when: lib_net.br_if == "null"
 
 - name: Spegnimento {{ lib_vm.vm_name }}
   community.libvirt.virt:
@@ -34,8 +34,8 @@
 - name: Preparo ifcfg-eth0 file
   #become: yes
   shell: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --run-command 'rm /etc/sysconfig/network-scripts/ifcfg-eth0 '
-  when: create_vm  == "yes"
-  ignore_errors: yes
+  when: lib_net.br_if != "null"
+#  ignore_errors: yes
 
 
 - name: prepare | set ifcfg-eth0 file
@@ -51,8 +51,8 @@
     - NETMASK={{ netmask }}
     - GATEWAY={{ gateway }}
     - DNS1={{ dns1 }}
-  when: create_vm  == "yes"
-  ignore_errors: yes
+  when: lib_net.br_if != "null"
+#  ignore_errors: yes
 
 - name: Accensione {{ lib_vm.vm_name }}
   community.libvirt.virt:
