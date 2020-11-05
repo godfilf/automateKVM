@@ -1,5 +1,5 @@
 ---
 - name: 'Controllo prametri null o invalidi'
   fail: msg="Necessario Inserire il parametro {{ item }}"
-  loop: [ lib_vm.vm_name, lib_vm.vm_root_pwd, lib_vm.qcow, lib_vm.path_img, lib_vm.qcow_name, lib_vm.vm_directory, lib_vm.template_size ]
+  loop: [ lib_vm.vm_name, lib_vm.vm_root_pwd, lib_vm.qcow, lib_vm.path_img, lib_vm.qcow_name, lib_vm.vm_directory ]
   when: "{{ item }} is not defined or {{ item }} == 'null'"

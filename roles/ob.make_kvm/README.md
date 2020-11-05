@@ -51,7 +51,7 @@ lib_vm:
   path_img: "null"                      ## NECESSARIO : Path di origine dell'immagine QCOW
   qcow_name: "null"                     ## NECESSARIO : Nome del file QCOW, locato nella var "path_img"
   vm_directory: "/Work/StoreVM"         ## NECESSARIO : Path di destinazione del QCOW della VM che sta per essere creata
-  template_size: "50G"                  ## NECESSARIO : Capacità dell'immagine 
+  #template_size: "50G"                 ## DEPRECATA : non usata in tutto il role
  
 lib_os:
   vm_hostname: "null"                   ## Hostname da assegnare all'OS se viene definita nel playbook
@@ -68,7 +68,7 @@ lib_net:
   dns1: "8.8.8.8"                       ## E' il DNS della VM creata. Modificabile in base alle proprie conf di rete
 
 
-  
+
 Example Playbook
 ----------------
 

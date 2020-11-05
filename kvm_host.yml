@@ -20,8 +20,7 @@
 
       lib_os:
         vm_hostname: "centos1"
-        vm_user: 'kadmin'
-	
+        vm_user: "kadmin"
 
       lib_net:
         br_if: "knat0"
