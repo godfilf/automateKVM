@@ -68,20 +68,44 @@ lib_net:
   dns1: "8.8.8.8"                       ## E' il DNS della VM creata. Modificabile in base alle proprie conf di rete
 
 
-
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
+  
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+---
+- name: Create VMs
+  hosts: hypervisor
+  remote_user: overburn
+  roles:
+    - role: ob.make_kvm
+      pbpath: '/Work/MyPrj/hosts'
+      filetarget: "hosts.target"
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+      lib_vm:
+        vm_name: 'vm1'
+        vm_mem: '1024'
+        vm_vcpu: '1'
+        vm_os: 'generic'
+        vm_root_pwd: 'p1pp0123'
+        qcow: 'present'
+        path_img: '../templates/qcowimg'
+        qcow_name: "CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2"
+        vm_directory: '/Work/StoreVM'
+
+      lib_os:
+        vm_hostname: "centos1"
+        vm_user: 'kadmin'
+	
+
+      lib_net:
+        br_if: "knat0"
+        br_net: kvm-NAT
+        br_net_gw: 192.168.124.1
+        br_net_mask: 255.255.255.0
+        ip_address: "192.168.123.4"
+        netmask: "255.255.255.0"
+        gateway: "192.168.123.1"
+
 
 License
 -------
@@ -91,4 +115,4 @@ BSD
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Michele Costa => costa.tux@gmail.com 
