@@ -1,21 +1,36 @@
 ---
 #Create Virtual Machine
 
+- name: Control vm name
+  community.libvirt.virt:
+    command: status
+    name: "{{ lib_vm.vm_name }}"
+  register: vm_state
+  ignore_errors: yes
+
+
+- name: Controllo se esiste la VM
+  fail: msg="La VM {{ lib_vm.vm_name }} esiste!"
+  when: vm_state.status == 'shutdown' or vm_state.status == 'running'
+  ignore_errors: yes
+
 - name: Correct BUG Permission
   script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.out
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running'
 
 - name: prepare with NET | boot vm
   shell: virt-install --connect qemu:///system --ram "{{ lib_vm.vm_mem }}" --vcpus maxvcpus=10 --vcpus "{{ lib_vm.vm_vcpu }}"  --os-variant "{{ lib_vm.vm_os }}" --disk path="{{ lib_vm.vm_directory}}"/"{{ lib_vm.vm_name }}".qcow2,device=disk,perms=rw,bus=virtio,format=qcow2 --import --noautoconsole --vnc --network=bridge:"{{ lib_net.br_if }}" --name "{{ lib_vm.vm_name }}"
-  when: lib_net.br_if != "null"
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running' and lib_net.br_if != "null"
 
 - name: prepare without NET | boot vm
   shell: virt-install --connect qemu:///system --ram "{{ lib_vm.vm_mem }}" --vcpus "{{ lib_vm.vm_vcpu }}"  --os-variant "{{ lib_vm.vm_os }}" --disk path="{{ lib_vm.vm_directory}}"/"{{ lib_vm.vm_name }}".qcow2,device=disk,perms=rw,bus=virtio,format=qcow2 --import --noautoconsole --vnc --name "{{ lib_vm.vm_name }}"
-  when: lib_net.br_if == "null"
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running' and lib_net.br_if != "null"
 
 - name: Spegnimento {{ lib_vm.vm_name }}
   community.libvirt.virt:
     name: "{{ lib_vm.vm_name }}"
     command: destroy
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running' and lib_net.br_if != "null"
 
 - name: list all VMs
   community.libvirt.virt:
@@ -26,15 +41,17 @@
 
 - name: Correct BUG Permission
   script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.pippo
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running'
 
 - name: prepare | remove cloud init
   ##become: yes
   shell: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --run-command 'yum remove cloud-init* -y'
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running' and lib_net.br_if != "null"
 
 - name: Preparo ifcfg-eth0 file
   #become: yes
   shell: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --run-command 'rm /etc/sysconfig/network-scripts/ifcfg-eth0 '
-  when: lib_net.br_if != "null"
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running' and lib_net.br_if != "null"
 #  ignore_errors: yes
 
 
@@ -51,34 +68,40 @@
     - NETMASK="{{ lib_net.netmask }}"
     - GATEWAY="{{ lib_net.gateway }}"
     - DNS1="8.8.8.8"
-  when: lib_net.br_if != "null"
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running' and lib_net.br_if != "null"
 #  ignore_errors: yes
 
 - name: Accensione {{ lib_vm.vm_name }}
   community.libvirt.virt:
     name: "{{ lib_vm.vm_name }}"
     command: start
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running'
 
 - name: Spegnimento {{ lib_vm.vm_name }}
   community.libvirt.virt:
     name: "{{ lib_vm.vm_name }}"
     command: destroy
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running'
 
 - name: Correct BUG Permission
   script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.out
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running'
 
 - name: prepare | set USER account
   shell: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --run-command 'useradd -m -p "" {{ lib_os.vm_user }}; chage -d 0 {{ lib_os.vm_user }}'
   when: lib_os.vm_user is defined
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running'
 
 - name: prepare | set hostname
   command: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --hostname {{ lib_os.vm_hostname }}
   when: lib_os.vm_hostname != 'null'
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running'
 
 - name: Accensione {{ lib_vm.vm_name }}
   community.libvirt.virt:
     name: "{{ lib_vm.vm_name }}"
     command: start
+  when: vm_state.status != 'shutdown' and vm_state.status != 'running'
 
 ##
 ##- name: prepare | live set {{ lib_vm.vm_name }} vCPU {{ lib_vm.cpu_set }}

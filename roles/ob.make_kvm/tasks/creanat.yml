@@ -3,12 +3,13 @@
 
 
 - community.libvirt.virt_net:
-    state: present
-    name: kvm_NAT
-  register: valore
+#    state: present
+    command: status
+    name: "{{ lib_net.br_net }}"
+  register: vm_net_state
   ignore_errors: yes
 - debug:
-    msg: Var = {{ valore }}
+    msg: "{{ vm_net_state }}"
 
 
 - name: make XML net file
@@ -22,27 +23,28 @@
         <ip address="{{ lib_net.br_net_gw }}" netmask="{{ lib_net.br_net_mask }}">
         </ip>
       </network>
-  when: valore is failed and lib_net.br_net is defined and lib_net.br_if != 'null' 
+  when: vm_net_state is failed and lib_net.br_net is defined and lib_net.br_if != 'null' 
 
 
 - name: Define NET
   become: yes
-  command: "virsh net-{{ item }}"
-  with_items:
-  - define --file /tmp/kvmNAT.xml
-  when: valore is failed and lib_net.br_net is defined and lib_net.br_if != 'null' 
+  command: "virsh net-define --file /tmp/{{ lib_net.br_net }}.xml"
+##  command: "virsh net-{{ item }}"
+##  with_items:
+##  - define --file /tmp/kvmNAT.xml
+  when: vm_net_state is failed and lib_net.br_net is defined and lib_net.br_if != 'null' 
 
 - name: set autostart NET
   community.libvirt.virt_net:
     autostart: yes
     name: "{{ lib_net.br_net }}"
-  when: lib_net.br_net is defined and lib_net.br_if != 'null'
+  when: vm_net_state is failed and lib_net.br_net is defined and lib_net.br_if != 'null' 
 
 - name: Start NET
   community.libvirt.virt_net:
     command: start 
     name: "{{ lib_net.br_net }}"
-  when: valore is failed and lib_net.br_net is defined
+  when: vm_net_state is failed and lib_net.br_net is defined
 
 - name: Stato NET
   community.libvirt.virt_net:
