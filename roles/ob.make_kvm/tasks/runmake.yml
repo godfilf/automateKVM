@@ -1,8 +1,38 @@
 ---
 
+- name: Inizio Op "{{ lib_vm['vm_name'] }}"
+  debug:
+#    var: vm_state
+    msg: Crea con scheda di rete = "{{ lib_state['br_if_create'] }}"
+
 - include_tasks: reqvar.yml
 - include_tasks: setvmhosts.yml
 - include_tasks: chkimg.yml
+
 - include_tasks: creanat.yml
+#  when: lib_state['br_net_create'] == 'yes'
+
 - include_tasks: basicconf.yml
+
+- name: Control vm name
+  community.libvirt.virt:
+    command: status
+    name: "{{ lib_vm.vm_name }}"
+  register: vm_state
+  ignore_errors: yes
+
+
+- name: Controllo se esiste la VM
+  fail: msg="La VM {{ lib_vm.vm_name }} esiste!"
+  when: vm_state.status == 'shutdown' or vm_state.status == 'running'
+  ignore_errors: yes
+- debug:
+    var: vm_state
+#- debug:
+#    msg: VAR = "{{ vm_state.status }}"
+
 - include_tasks: create_vm.yml
+  when: vm_state is failed and vm_state.status is not defined
+
+- pause:
+    seconds: 60

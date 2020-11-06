@@ -15,18 +15,23 @@ lib_vm:
   path_img: "null"
   qcow_name: "CentOS-8-ec2-8.1.1911-20200113.3.x86_64.qcow2"
   vm_directory: "/Work/StoreVM"
-  template_size: "50G"
+  template_size: "10G"
   
 lib_os:
   vm_hostname: "null"
   #vm_user:
   
 lib_net:
-  #br_net:
-  br_if: "null"
+#  br_net:
+#  br_if:
   br_net_gw: "192.168.123.1"
   br_net_mask: 255.255.255.0
   ip_address: "192.168.123.3"
   netmask: "255.255.255.0"
   gateway: "192.168.123.1"
   dns1: "8.8.8.8"
+
+lib_state:
+  br_if_create: "yes"
+  br_net_create: "yes"
+

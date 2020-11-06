@@ -60,7 +60,7 @@ Role Variables
 	  
 	lib_net:
 	  #br_net: "kvm-NAT"                    ## Necessario solo se si vuole far creare al role un rete kvm da 0. Indica il nome della rete in KVM. NON crea schede in bridge. Solo NAT.
-	  br_if: "null"                         ## Necessario solo se si decide di creare la NET con il role. Questo è il nome della scheda sull'hypervisor KVM
+	  br_if: "null"                         ## Necessario per la NET con il role. Questo è il nome della scheda sull'hypervisor KVM
 	  br_net_gw: "192.168.123.1"            ## Indica l'ip che avrà la NET creata su KVM. Sarà il def gw della VM
 	  br_net_mask: 255.255.255.0            ## Indica la netmask da assegnare alla NET creata su KVM.
 	  ip_address: "192.168.123.3"           ## E' l'IP da assegnare alla scheda della VM creata 

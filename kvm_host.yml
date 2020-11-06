@@ -2,6 +2,7 @@
 - name: Create VMs
   hosts: hypervisor
   remote_user: overburn
+  gather_facts: true
   roles:
 
 ######################################
@@ -34,6 +35,9 @@
         ip_address: "192.168.123.3"
         netmask: "255.255.255.0"
         gateway: "192.168.123.1"
+
+      lib_state:
+        br_if_create: "no"
 
 ######################################
 ## Creo la seconda nuova VM : vm2
