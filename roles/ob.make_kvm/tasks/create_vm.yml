@@ -40,17 +40,17 @@
 
 - name: prepare | set ifcfg-eth0 file
   #become: yes
-  shell: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --run-command 'echo {{ item }}  >> /etc/sysconfig/network-scripts/ifcfg-eth0 '
+  shell: virt-customize -a "{{ lib_vm.vm_directory}}"/"{{ lib_vm.vm_name }}".qcow2 --run-command 'echo \"{{ item }}\"  >> /etc/sysconfig/network-scripts/ifcfg-eth0 '
   with_items: 
     - DEVICE="eth0"
     - ONBOOT="yes"
     - TYPE="Ethernet"
     - PEERDNS="yes"
     - IPV6INIT="no"
-    - IPADDR={{ lib_net.ip_address }}
-    - NETMASK={{ lib_net.netmask }}
-    - GATEWAY={{ lib_net.gateway }}
-    - DNS1={{ dns1 }}
+    - IPADDR="{{ lib_net.ip_address }}"
+    - NETMASK="{{ lib_net.netmask }}"
+    - GATEWAY="{{ lib_net.gateway }}"
+    - DNS1="8.8.8.8"
   when: lib_net.br_if != "null"
 #  ignore_errors: yes
 
@@ -65,20 +65,20 @@
     command: destroy
 
 - name: Correct BUG Permission
-  script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.pippo
+  script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.out
 
 - name: prepare | set USER account
   shell: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --run-command 'useradd -m -p "" {{ lib_os.vm_user }}; chage -d 0 {{ lib_os.vm_user }}'
   when: lib_os.vm_user is defined
 
-- name: prepare | set hostname
-  command: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --hostname {{ lib_os.vm_hostname }}
-  when: lib_os.vm_hostname != 'null'
-
-- name: Accensione {{ lib_vm.vm_name }}
-  community.libvirt.virt:
-    name: "{{ lib_vm.vm_name }}"
-    command: start
+##- name: prepare | set hostname
+##  command: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --hostname {{ lib_os.vm_hostname }}
+##  when: lib_os.vm_hostname != 'null'
+##
+##- name: Accensione {{ lib_vm.vm_name }}
+##  community.libvirt.virt:
+##    name: "{{ lib_vm.vm_name }}"
+##    command: start
 
 ##
 ##- name: prepare | live set {{ lib_vm.vm_name }} vCPU {{ lib_vm.cpu_set }}
