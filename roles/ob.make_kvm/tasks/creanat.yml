@@ -28,10 +28,7 @@
 
 - name: Define NET
   become: yes
-  command: "virsh net-define --file /tmp/{{ lib_net.br_net }}.xml"
-##  command: "virsh net-{{ item }}"
-##  with_items:
-##  - define --file /tmp/kvmNAT.xml
+  command: "virsh net-define --file /tmp/kvmNAT.xml"
   when: vm_net_state is failed and lib_net.br_net is defined and lib_net.br_if != 'null' 
 
 - name: set autostart NET
