@@ -1,9 +1,19 @@
 ---
 # Crea La net in base alla scelta effettuata sul prompt
 
+
+- community.libvirt.virt_net:
+    state: present
+    name: kvm_NAT
+  register: valore
+  ignore_errors: yes
+- debug:
+    msg: Var = {{ valore }}
+
+
 - name: make XML net file
   copy:
-    dest: "/tmp/kvmNAT.xml.j2"
+    dest: "/tmp/kvmNAT.xml"
     content: |
       <network>
         <name>{{ lib_net.br_net }}</name>
@@ -12,15 +22,15 @@
         <ip address="{{ lib_net.br_net_gw }}" netmask="{{ lib_net.br_net_mask }}">
         </ip>
       </network>
+  when: valore is failed and lib_net.br_net is defined and lib_net.br_if != 'null' 
 
-  when: lib_net.br_net is defined and lib_net.br_if != 'null' 
 
 - name: Define NET
   become: yes
   command: "virsh net-{{ item }}"
   with_items:
   - define --file /tmp/kvmNAT.xml
-  when: lib_net.br_net is defined and lib_net.br_if != 'null'
+  when: valore is failed and lib_net.br_net is defined and lib_net.br_if != 'null' 
 
 - name: set autostart NET
   community.libvirt.virt_net:
@@ -32,7 +42,7 @@
   community.libvirt.virt_net:
     command: start 
     name: "{{ lib_net.br_net }}"
-  when: lib_net.br_net is defined and lib_net.br_if != 'null'
+  when: valore is failed and lib_net.br_net is defined
 
 - name: Stato NET
   community.libvirt.virt_net:

@@ -71,14 +71,14 @@
   shell: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --run-command 'useradd -m -p "" {{ lib_os.vm_user }}; chage -d 0 {{ lib_os.vm_user }}'
   when: lib_os.vm_user is defined
 
-##- name: prepare | set hostname
-##  command: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --hostname {{ lib_os.vm_hostname }}
-##  when: lib_os.vm_hostname != 'null'
-##
-##- name: Accensione {{ lib_vm.vm_name }}
-##  community.libvirt.virt:
-##    name: "{{ lib_vm.vm_name }}"
-##    command: start
+- name: prepare | set hostname
+  command: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --hostname {{ lib_os.vm_hostname }}
+  when: lib_os.vm_hostname != 'null'
+
+- name: Accensione {{ lib_vm.vm_name }}
+  community.libvirt.virt:
+    name: "{{ lib_vm.vm_name }}"
+    command: start
 
 ##
 ##- name: prepare | live set {{ lib_vm.vm_name }} vCPU {{ lib_vm.cpu_set }}
