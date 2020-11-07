@@ -6,13 +6,10 @@
     msg: Crea con scheda di rete = "{{ lib_state['br_if_create'] }}"
 
 - include_tasks: reqvar.yml
-- include_tasks: setvmhosts.yml
-- include_tasks: chkimg.yml
 
 - include_tasks: creanat.yml
 #  when: lib_state['br_net_create'] == 'yes'
 
-- include_tasks: basicconf.yml
 
 - name: Control vm name
   community.libvirt.virt:
@@ -31,8 +28,14 @@
 #- debug:
 #    msg: VAR = "{{ vm_state.status }}"
 
+- include_tasks: chkimg.yml
+  when: vm_state is failed and vm_state.status is not defined
+- include_tasks: basicconf.yml
+  when: vm_state is failed and vm_state.status is not defined
 - include_tasks: create_vm.yml
+  when: vm_state is failed and vm_state.status is not defined
+- include_tasks: setvmhosts.yml
   when: vm_state is failed and vm_state.status is not defined
 
 - pause:
-    seconds: 60
+    seconds: 240

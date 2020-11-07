@@ -13,4 +13,3 @@
   include_tasks: runmake.yml
   when: ansible_os_family == "RedHat" or ansible_os_family == "Debian" 
     
-
