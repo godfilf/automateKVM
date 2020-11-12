@@ -5,7 +5,7 @@
   gather_facts: true
   roles:
 
-####################################
+##################################
 ## Creo la prima nuova VM : vm1
 
     - role: ob.make_kvm
@@ -40,161 +40,159 @@
 #      lib_state:
 #        br_if_create: "no"
 
-########################################
-#### Creo la seconda nuova VM : vm2
-##
-##    - role: ob.make_kvm
-##      pbpath: '/Work/MyPrj/hosts'
-##      filetarget: "hosts.target"
-##
-##      lib_vm:
-##        vm_name: 'vm2'
-##        vm_mem: '1024'
-##        vm_vcpu: '1'
-##        vm_os: 'generic'
-##        vm_root_pwd: 'p1pp0123'
-##        qcow: 'present'
-##        path_img: '../templates/qcowimg'
-##        qcow_name: "Centos8_compressed.qcow2"
-##        vm_directory: '/Work/StoreVM'
-##
-##      lib_os:
-##        vm_hostname: "centos2"
-##        vm_user: "kadmin"
-##        vm_user_pwd: "p1pp0"
-##
-##      lib_net:
-##        br_if: "knat0"
-##        br_net: kvm-NAT
-##        br_net_gw: 192.168.124.1
-##        br_net_mask: 255.255.255.0
-##        ip_address: "192.168.123.4"
-##        netmask: "255.255.255.0"
-##        gateway: "192.168.123.1"
-##
-########################################
-#### Attacco 2 nuovi dischi alla vm1
-##
-##    - role: jooho.kvm_operate
-##      vars:
-##        kind: storage
-##        operate: attach
-##        target_vm: vm1
-##        disk_size: 30G
-##        kvm_vm_pool_dir: '/Work/StoreVM'
-##
-##    - role: jooho.kvm_operate
-##      vars:
-##        kind: storage
-##        operate: attach
-##        target_vm: vm1
-##        disk_size: 30G
-##        kvm_vm_pool_dir: '/Work/StoreVM'
-##
-########################################
-#### Attacco 2 nuovi dischi alla vm2
-##
-##    - role: jooho.kvm_operate
-##      vars:
-##        kind: storage
-##        operate: attach
-##        target_vm: vm2
-##        disk_size: 30G
-##        kvm_vm_pool_dir: '/Work/StoreVM'
-##
-##    - role: jooho.kvm_operate
-##      vars:
-##        kind: storage
-##        operate: attach
-##        target_vm: vm2
-##        disk_size: 30G
-##        kvm_vm_pool_dir: '/Work/StoreVM'
-##
-##
-########################################
-#### 
-##
-##- name: Crate User
-##  hosts: vm
-##  remote_user: root
-##  tasks:
-##    - name: Create a login user
-##      user:
-##        name: kadmin
-##        password: 'p1pp0123'
-##        groups: # Empty by default, here we give it some groups
-##         - docker
-##         - sudo
-##        state: present
-##        shell: /bin/bash       # Defaults to /bin/bash
-##        system: no             # Defaults to no
-##        createhome: yes        # Defaults to yes
-##        home: /home/kadmin  # Defaults to /home/<username>
-##
-########################################
-#### Cambio l'host su cui lavorare.
-##
-##- name: Crate Docker
-##  hosts: vm
-##  remote_user: kadmin
-##  become: yes
-##  roles:
-##
-########################################
-#### Creo un vg per Docker
-##
-##    - role: ob.manage_lvm
-##      vg_groups: 
-##        vgname: vg_docker
-##        disks:
-##          - /dev/vdb
-##          - /dev/vdc
-##      lv_groups:
-##        lvname: lv_docker1
-##        size: 40g
-##        create: true
-##        filesystem: ext4
-##        mount: true
-##        mntp: /mnt
-##
-########################################
-#### Installo docker sulle VM appena create.
-##
-##    - role: darkwizard242.docker
-##      docker_apps:
-##        - docker-ce
-##        - docker-ce-cli
-##        - containerd.io
-##      docker_apps_desired_state: present
-##      docker_service_name: docker
-##      docker_service_desired_state: restarted
-##      docker_service_desired_boot_enabled: yes
-##      docker_group: kadmin
-##      docker_group_desired_state: present
-##      docker_user: kadmin
-##      docker_user_home: "/home/{{ docker_user }}"
-##      docker_user_shell: /bin/bash
-##      docker_user_desired_state: present
-##      docker_centos_pre_reqs:
-##        - device-mapper-persistent-data
-##        - lvm2
-##      docker_centos_pre_reqs_desired_state: present
-##      docker_repo_centos: https://download.docker.com/linux/centos/8/$basearch/stable
-##      docker_repo_centos_gpg_key: https://download.docker.com/linux/centos/gpg
-##      docker_repo_centos_name: docker-ce-stable
-##      docker_repo_centos_description: Docker CE Stable - $basearch
-##      docker_repo_centos_gpgcheck: yes
-##      docker_repo_centos_enabled: yes
-##      docker_repo_centos_filename: docker-ce
-##      docker_repo_centos_desired_state: present
-##
-##
-###    - role: ome.docker
-###      #docker_use_custom_storage: True
-###      docker_vgname: vg_docker
-###      docker_poolsize: 100%FREE
-###      docker_metadatasize: 400m
-###      lvm_lvname: lv_docker
-###      lvm_lvmount: /var/lib/docker
-###      lvm_lvsize: 40g
-###      lvm_lvfilesystem: ext4
+######################################
+## Creo la seconda nuova VM : vm2
+
+    - role: ob.make_kvm
+      pbpath: '/Work/MyPrj/hosts'
+      filetarget: "hosts.target"
+
+      lib_vm:
+        vm_name: 'vm2'
+        vm_mem: '1024'
+        vm_vcpu: '1'
+        vm_os: 'generic'
+        vm_root_pwd: 'p1pp0123'
+        qcow: 'present'
+        path_img: '../templates/qcowimg'
+        qcow_name: "Centos8_compressed.qcow2"
+        vm_directory: '/Work/StoreVM'
+
+      lib_os:
+        vm_hostname: "centos2"
+        vm_user: "kadmin"
+        vm_user_pwd: "p1pp0"
+
+      lib_net:
+        br_if: "knat0"
+        br_net: kvm-NAT
+        br_net_gw: 192.168.124.1
+        br_net_mask: 255.255.255.0
+        ip_address: "192.168.124.4"
+        netmask: "255.255.255.0"
+        gateway: "192.168.124.1"
+
+####################################
+## Attacco 2 nuovi dischi alla vm1
+
+    - role: jooho.kvm_operate
+      vars:
+        kind: storage
+        operate: attach
+        target_vm: vm1
+        disk_size: 30G
+        kvm_vm_pool_dir: '/Work/StoreVM'
+
+    - role: jooho.kvm_operate
+      vars:
+        kind: storage
+        operate: attach
+        target_vm: vm1
+        disk_size: 30G
+        kvm_vm_pool_dir: '/Work/StoreVM'
+
+####################################
+## Attacco 2 nuovi dischi alla vm2
+
+    - role: jooho.kvm_operate
+      vars:
+        kind: storage
+        operate: attach
+        target_vm: vm2
+        disk_size: 30G
+        kvm_vm_pool_dir: '/Work/StoreVM'
+
+    - role: jooho.kvm_operate
+      vars:
+        kind: storage
+        operate: attach
+        target_vm: vm2
+        disk_size: 30G
+        kvm_vm_pool_dir: '/Work/StoreVM'
+
+
+##################################
+## Inserisco le chiavi delle nuove VM
+
+- name: Insert Key
+  hosts: vm
+  connection: local
+  become: yes
+  gather_facts: no
+  tasks:
+    - command: /usr/bin/ssh-keyscan -T 10 -t ecdsa {{ ansible_host }}
+      register: keyscan
+    - lineinfile: 
+        path: "/home/overburn/.ssh/known_hosts" 
+        create: yes 
+        line: "{{ keyscan.stdout }}"
+
+
+
+##################################
+## Cambio l'host su cui lavorare.
+
+- name: Crate Docker
+  hosts: vm
+  remote_user: kadmin
+  become: yes
+  roles:
+
+##################################
+## Creo un vg per Docker
+
+    - role: ob.manage_lvm
+      vg_groups: 
+        vgname: vg_docker
+        disks:
+          - /dev/vdb
+          - /dev/vdc
+      lv_groups:
+        lvname: lv_docker1
+        size: 40g
+        create: true
+        filesystem: ext4
+        mount: true
+        mntp: /mnt
+
+####################################
+## Installo docker sulle VM appena create.
+
+    - role: darkwizard242.docker
+      docker_apps:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+      docker_apps_desired_state: present
+      docker_service_name: docker
+      docker_service_desired_state: restarted
+      docker_service_desired_boot_enabled: yes
+      docker_group: kadmin
+      docker_group_desired_state: present
+      docker_user: kadmin
+      docker_user_home: "/home/{{ docker_user }}"
+      docker_user_shell: /bin/bash
+      docker_user_desired_state: present
+      docker_centos_pre_reqs:
+        - device-mapper-persistent-data
+        - lvm2
+      docker_centos_pre_reqs_desired_state: present
+      docker_repo_centos: https://download.docker.com/linux/centos/8/$basearch/stable
+      docker_repo_centos_gpg_key: https://download.docker.com/linux/centos/gpg
+      docker_repo_centos_name: docker-ce-stable
+      docker_repo_centos_description: Docker CE Stable - $basearch
+      docker_repo_centos_gpgcheck: yes
+      docker_repo_centos_enabled: yes
+      docker_repo_centos_filename: docker-ce
+      docker_repo_centos_desired_state: present
+
+
+#    - role: ome.docker
+#      #docker_use_custom_storage: True
+#      docker_vgname: vg_docker
+#      docker_poolsize: 100%FREE
+#      docker_metadatasize: 400m
+#      lvm_lvname: lv_docker
+#      lvm_lvmount: /var/lib/docker
+#      lvm_lvsize: 40g
+#      lvm_lvfilesystem: ext4

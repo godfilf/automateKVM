@@ -1,6 +1,12 @@
 ---
 #Create the template 
 
+- name: perpare | script sudoers
+  copy:
+    dest: "/tmp/sudouser.sh"
+    content: |
+      echo '%{{ lib_os.vm_user }} ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+
 - name: prepare | create directory for Virtual Machines
   become: yes
   file:
@@ -20,6 +26,10 @@
 - name: prepare | set root password
   #become: yes
   shell: virt-sysprep -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --root-password password:{{ lib_vm.vm_root_pwd }}
+
+- name: prepare | sudoers file
+#  shell: virt-sysprep -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --run-command "echo '%{{ lib_os.vm_user }} ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers"
+  shell: virt-sysprep -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --run /tmp/sudouser.sh
 
 - name: Preparo ifcfg-eth0 file
   #become: yes

@@ -11,6 +11,6 @@
   lineinfile:
     path: "{{ hoststarget }}"
     insertbefore: ^[vm]
-    line: "{{ lib_vm.vm_name }}"
+    line: "{{ lib_vm.vm_name }}" ansible_host="{{ lib_net.ip_address }}"
     create: yes
 
