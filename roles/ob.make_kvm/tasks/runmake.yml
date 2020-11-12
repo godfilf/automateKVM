@@ -28,8 +28,8 @@
 #- debug:
 #    msg: VAR = "{{ vm_state.status }}"
 
-- include_tasks: chkimg.yml
-  when: vm_state is failed and vm_state.status is not defined
+##- include_tasks: chkimg.yml
+##  when: vm_state is failed and vm_state.status is not defined
 - include_tasks: basicconf.yml
   when: vm_state is failed and vm_state.status is not defined
 - include_tasks: create_vm.yml
@@ -37,5 +37,5 @@
 - include_tasks: setvmhosts.yml
   when: vm_state is failed and vm_state.status is not defined
 
-- pause:
-    seconds: 240
+#- pause:
+#    seconds: 240

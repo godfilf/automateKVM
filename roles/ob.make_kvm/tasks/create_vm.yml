@@ -1,11 +1,9 @@
 ---
 #Create Virtual Machine
 
-#- name: Correct BUG Permission
-#  script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.out
-
 - name: prepare with NET | boot "{{ lib_vm.vm_name }}"
   shell: virt-install --connect qemu:///system --ram "{{ lib_vm.vm_mem }}" --vcpus maxvcpus=10 --vcpus "{{ lib_vm.vm_vcpu }}"  --os-variant "{{ lib_vm.vm_os }}" --disk path="{{ lib_vm.vm_directory}}"/"{{ lib_vm.vm_name }}".qcow2,device=disk,perms=rw,bus=virtio,format=qcow2 --import --noautoconsole --vnc --network=bridge:"{{ lib_net.br_if }}" --name "{{ lib_vm.vm_name }}"
+#  shell: virt-install --connect qemu:///system --ram "{{ lib_vm.vm_mem }}" --vcpus maxvcpus=10 --vcpus "{{ lib_vm.vm_vcpu }}"  --os-variant "{{ lib_vm.vm_os }}" --disk path="{{ lib_vm.vm_directory}}"/"{{ lib_vm.vm_name }}".qcow2,device=disk,perms=rw,bus=virtio,format=raw --import --noautoconsole --vnc --network=bridge:"{{ lib_net.br_if }}" --name "{{ lib_vm.vm_name }}"
   when: lib_state['br_if_create'] == 'yes'
   ignore_errors: yes
 
@@ -14,11 +12,6 @@
   when: lib_state['br_if_create'] == 'no'
   ignore_errors: yes
 
-##- name: Spegnimento {{ lib_vm.vm_name }}
-##  community.libvirt.virt:
-##    name: "{{ lib_vm.vm_name }}"
-##    command: destroy
-
 - name: list all VMs
   community.libvirt.virt:
     command: list_vms
@@ -26,31 +19,38 @@
 - debug:
     var: all_vms
 
-##- name: Correct BUG Permission
-##  script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.pippo
-
-##- name: Accensione {{ lib_vm.vm_name }}
-##  community.libvirt.virt:
-##    name: "{{ lib_vm.vm_name }}"
-##    command: start
-##
 - name: Attendo per la vm
   pause: 
-    seconds: 45
+    seconds: 140
+
+#- name: Spegnimento {{ lib_vm.vm_name }}
+#  community.libvirt.virt:
+#    name: "{{ lib_vm.vm_name }}"
+#    command: destroy
+#
+#- name: Correct BUG Permission
+#  script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.out
+#
+#- name: Set Change user pwd
+#  shell: virt-sysprep -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --run-command 'chage -d 0 {{ lib_os.vm_user }}'
+#
+##- name: Correct BUG Permission
+##  script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.out
 ##
-##- name: Spegnimento {{ lib_vm.vm_name }}
-##  community.libvirt.virt:
-##    name: "{{ lib_vm.vm_name }}"
-##    command: destroy
-##
-###- name: Correct BUG Permission
-###  script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.out
-##
-##- name: Accensione {{ lib_vm.vm_name }}
-##  community.libvirt.virt:
-##    name: "{{ lib_vm.vm_name }}"
-##    command: start
-##
+#- name: prepare | set root password
+#  #become: yes
+#  shell: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --root-password password:{{ lib_vm.vm_root_pwd }}
+#
+#- name: Accensione {{ lib_vm.vm_name }}
+#  community.libvirt.virt:
+#    name: "{{ lib_vm.vm_name }}"
+#    command: start
+
+
+
+
+
+
 ##- name: Attendo per la vm
 ##  pause: 
 

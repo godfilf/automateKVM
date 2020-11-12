@@ -24,11 +24,11 @@ lib_os:
 lib_net:
 #  br_net:
 #  br_if:
-  br_net_gw: "192.168.123.1"
-  br_net_mask: 255.255.255.0
-  ip_address: "192.168.123.3"
-  netmask: "255.255.255.0"
-  gateway: "192.168.123.1"
+  br_net_gw: 
+  br_net_mask: 
+  ip_address: 
+  netmask: 
+  gateway: 
   dns1: "8.8.8.8"
 
 lib_state:

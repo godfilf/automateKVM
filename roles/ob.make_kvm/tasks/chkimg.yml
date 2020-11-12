@@ -1,4 +1,14 @@
 ---
+- name: prepare | create directory for Virtual Machines
+  become: yes
+  file:
+    path: "{{ lib_vm.vm_directory }}"
+    state: directory
+    owner: overburn
+    group: overburn
+    mode: 0775
+    recurse: yes
+
 - name: Copia il QCOW 
   copy:
     src: "{{ lib_vm.path_img }}/{{ lib_vm.qcow_name }}"
