@@ -1,0 +1,11 @@
+
+base_image_path: /tmp
+
+vm_name: vm1
+
+vmcfg:
+  storage:
+    extra:
+      size: 30G
+      type: ext4
+      name: vdx

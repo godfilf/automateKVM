@@ -72,53 +72,91 @@
         netmask: "255.255.255.0"
         gateway: "192.168.124.1"
 
-####################################
-## Attacco 2 nuovi dischi alla vm1
+#####################################
+### Attacco 2 nuovi dischi alle vm
 
-    - role: jooho.kvm_operate
+- name: Add Extra Storage
+  hosts: hypervisor
+  remote_user: overburn
+  gather_facts: true
+  tasks:
+    - import_role: 
+        name: ob.kvmdisk
       vars:
-        kind: storage
-        operate: attach
-        target_vm: vm1
-        disk_size: 30G
-        kvm_vm_pool_dir: '/Work/StoreVM'
+        vm_name: 'vm1'
+        vmcfg:
+          storage:
+            extra:
+              size: 30G
+              type: ext4
+              name: docker
+        base_image_path:   '/Work/StoreVM'
 
-    - role: jooho.kvm_operate
+    - name: Wait until the lock file is removed
+      wait_for:
+        path: /tmp/{{ vm_name }}_{{ vmcfg.storage.extra.name }}_disk_{{ disk_number.stdout }}.lock
+        state: absent
+
+    - import_role: 
+        name: ob.kvmdisk
       vars:
-        kind: storage
-        operate: attach
-        target_vm: vm1
-        disk_size: 30G
-        kvm_vm_pool_dir: '/Work/StoreVM'
+          vm_name: 'vm1'
+          vmcfg:
+            storage:
+              extra:
+                size: 30G
+                type: ext4
+                name: docker
+          base_image_path:   '/Work/StoreVM'
 
-####################################
-## Attacco 2 nuovi dischi alla vm2
+    - name: Wait until the lock file is removed
+      wait_for:
+        path: /tmp/{{ vm_name }}_{{ vmcfg.storage.extra.name }}_disk_{{ disk_number.stdout }}.lock
+        state: absent
 
-    - role: jooho.kvm_operate
+    - import_role: 
+        name: ob.kvmdisk
       vars:
-        kind: storage
-        operate: attach
-        target_vm: vm2
-        disk_size: 30G
-        kvm_vm_pool_dir: '/Work/StoreVM'
+          vm_name: 'vm2'
+          vmcfg:
+            storage:
+              extra:
+                size: 30G
+                type: ext4
+                name: docker
+          base_image_path:   '/Work/StoreVM'
 
-    - role: jooho.kvm_operate
+    - name: Wait until the lock file is removed
+      wait_for:
+        path: /tmp/{{ vm_name }}_{{ vmcfg.storage.extra.name }}_disk_{{ disk_number.stdout }}.lock
+        state: absent
+
+    - import_role: 
+        name: ob.kvmdisk
       vars:
-        kind: storage
-        operate: attach
-        target_vm: vm2
-        disk_size: 30G
-        kvm_vm_pool_dir: '/Work/StoreVM'
+          vm_name: 'vm2'
+          vmcfg:
+            storage:
+              extra:
+                size: 30G
+                type: ext4
+                name: docker
+          base_image_path:   '/Work/StoreVM'
+
+    - name: Wait until the lock file is removed
+      wait_for:
+        path: /tmp/{{ vm_name }}_{{ vmcfg.storage.extra.name }}_disk_{{ disk_number.stdout }}.lock
+        state: absent
 
 
-##################################
+################################
 ## Inserisco le chiavi delle nuove VM
 
-- name: Insert Key
+- name: Insert Fingerprint
   hosts: vm
   connection: local
   become: yes
-  gather_facts: no
+  gather_facts: true
   tasks:
     - command: /usr/bin/ssh-keyscan -T 10 -t ecdsa {{ ansible_host }}
       register: keyscan
@@ -155,7 +193,7 @@
         mount: true
         mntp: /mnt
 
-####################################
+##################################
 ## Installo docker sulle VM appena create.
 
     - role: darkwizard242.docker
@@ -196,3 +234,15 @@
 #      lvm_lvmount: /var/lib/docker
 #      lvm_lvsize: 40g
 #      lvm_lvfilesystem: ext4
+
+- name: Aggiungo L'utenete Al gruppo DOCKER
+  hosts: vm
+  remote_user: kadmin
+  become: yes
+  tasks:
+    - name: Add User to Group
+      user:
+        name: kadmin
+        groups: docker
+        append: yes
+

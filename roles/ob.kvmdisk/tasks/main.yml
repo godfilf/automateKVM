@@ -1,0 +1,84 @@
+- name: Default variables
+  set_fact:
+    force: false
+    disk_device: [ "vda", "vdb", "vdc", "vdd", "vdf", "vde" ]
+
+#- name: search disks
+#  shell: "virsh domblklist vm1|sed -e '1,2d'|awk '{print $1}'|head -n -1"
+#  register: disklist
+#  ignore_errors: yes
+- name: Controlla numero di volumi attaccati
+  shell: >
+     virsh domblklist "{{ vm_name }}"|grep "{{ vm_name }}"|wc -l
+  become: yes
+#  delegate_to: localhost
+  register: disk_number
+
+- name: Fallisci se ci stanno 6 dischi
+  fail:
+    msg: "Raggiunta la quota massima di volumi"
+  when: disk_number.stdout == '6'
+
+- name: Crea Lock File
+  file:
+    path: /tmp/{{ vm_name }}_{{ vmcfg.storage.extra.name }}_disk_{{ disk_number.stdout }}.lock
+    state: touch
+    mode: u=rw,g=r,o=r
+
+- set_fact:
+    force: false
+    img_file: "{{ base_image_path }}/{{ vm_name }}_{{ vmcfg.storage.extra.name }}_disk_{{ disk_number.stdout }}.qcow2"
+
+- name: Controlla se il QCOW esiste
+  stat:
+    path: "{{ img_file }}"
+    get_checksum: False
+    get_md5: False
+  become: yes
+  delegate_to: localhost
+  register: disk_exist
+
+
+##### Se inserisci la var foce tipo bool elimina il  disco
+#- name: Delete the image file
+#  file:
+#    path: "{{ img_file }}"
+#    state: absent
+#  when: force
+#  become: true
+
+- name: Create Storage
+  command: qemu-img create -f qcow2 -o preallocation=metadata {{ img_file }} {{ vmcfg.storage.extra.size }}
+  when: not disk_exist.stat.exists
+  become: true
+
+- name: Set Permissions
+  become: true
+  file:
+    path: "{{ img_file }}"
+    state: touch
+    mode: 0770
+    owner: libvirt-qemu
+    group: libvirt-qemu
+
+- name: Params
+  set_fact:
+    targetParam: "--target {{ disk_device[disk_number.stdout|int] }}"
+    sourceParam: "--source {{ img_file }}"
+    domainParam: "--domain {{ vm_name }}"
+    otherParams: "--driver qemu --subdriver qcow2 --config --live --persistent"
+
+- name: Attaching Storage to Client
+  command: virsh attach-disk {{ domainParam }} {{ sourceParam }} {{ targetParam }} {{ otherParams }}
+  become: true
+  when: true
+
+- name: Get the xml for the new configuration
+  virt:
+    name: "{{ vm_name }}"
+    command: get_xml
+
+- name: Rimuovo il lock file
+  file:
+    path: /tmp/{{ vm_name }}_{{ vmcfg.storage.extra.name }}_disk_{{ disk_number.stdout }}.lock
+    state: absent

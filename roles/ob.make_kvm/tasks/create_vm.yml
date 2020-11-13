@@ -27,28 +27,6 @@
 #  community.libvirt.virt:
 #    name: "{{ lib_vm.vm_name }}"
 #    command: destroy
-#
-#- name: Correct BUG Permission
-#  script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.out
-#
-#- name: Set Change user pwd
-#  shell: virt-sysprep -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --run-command 'chage -d 0 {{ lib_os.vm_user }}'
-#
-##- name: Correct BUG Permission
-##  script: ../templates/script/change_perm.bash {{ lib_vm.vm_directory }}/{{ lib_vm.vm_name }}.qcow2 >> /tmp/result.out
-##
-#- name: prepare | set root password
-#  #become: yes
-#  shell: virt-customize -a {{ lib_vm.vm_directory}}/{{ lib_vm.vm_name }}.qcow2 --root-password password:{{ lib_vm.vm_root_pwd }}
-#
-#- name: Accensione {{ lib_vm.vm_name }}
-#  community.libvirt.virt:
-#    name: "{{ lib_vm.vm_name }}"
-#    command: start
-
-
-
-
 
 
 ##- name: Attendo per la vm
